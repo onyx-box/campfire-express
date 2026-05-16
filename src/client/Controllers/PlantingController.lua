@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 
 local UserInputService = game:GetService("UserInputService")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -14,17 +13,12 @@ function PlantingController:KnitStart()
 
 	local mouse = player:GetMouse()
 
-	local PlantService =
-		Knit.GetService("PlantService")
+	local PlantService = Knit.GetService("PlantService")
 
 	UserInputService.InputBegan:Connect(
 		function(input, processed)
 
-			if processed then
-				return
-			end
-
-			if input.KeyCode ~= Enum.KeyCode.N then
+			if processed or input.KeyCode ~= Enum.KeyCode.N then
 				return
 			end
 
@@ -34,15 +28,20 @@ function PlantingController:KnitStart()
 				return
 			end
 
-			local position =
-				hit.Position
+            -- Raycast w dół żeby znaleźć punkt na ziemi, nawet jeśli kursor jest nad innym obiektem
+            local origin = hit.Position + Vector3.new(0, 5, 0)
+            local direction = Vector3.new(0, -10, 0)
+            local raycastParams = RaycastParams.new()
+            raycastParams.FilterDescendantsInstances = { player.Character }
+            raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
 
-			position =
-				Vector3.new(
-					position.X,
-					5,
-					position.Z
-				)
+            local result = workspace:Raycast(origin, direction, raycastParams)
+
+            if not result then
+                return
+            end
+
+			local position = result.Position + Vector3.new(0, 0.5, 0) -- Podnieś punkt trochę nad ziemię    
 
 			PlantService:PlantTree(position)
 				:andThen(function(success)

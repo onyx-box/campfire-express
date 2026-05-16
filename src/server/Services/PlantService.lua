@@ -21,9 +21,9 @@ function PlantService:PlantTree(player, position)
 	end
 
 	ResourceNodeService:CreateNode(
-		"wood",
-		position
-	)
+        "sapling",
+        position
+    )
 
 	print(
 		"[Plant]",

@@ -19,6 +19,7 @@ local NODE_DEFS = {
 		damagePerHit = 20,
 		promptText = "Chop wood",
 		requiredTool = "axe",
+		canHarvest = true,
 	},
 
 	scrap = {
@@ -29,6 +30,33 @@ local NODE_DEFS = {
 		damagePerHit = 20,
 		promptText = "Collect scrap",
 		requiredTool = "crowbar",
+		canHarvest = true,
+	},
+
+	sapling = {
+		name = "Sapling",
+		size = Vector3.new(1, 2, 1),
+		amountPerHit = 0,
+		maxHealth = 20,
+		damagePerHit = 10,
+		promptText = "Growing...",
+		requiredTool = nil,
+		canHarvest = false,
+		growsInto = "smallTree",
+		growTime = 20,
+	},
+
+	smallTree = {
+		name = "SmallTree",
+		size = Vector3.new(2, 5, 2),
+		amountPerHit = 8,
+		maxHealth = 30,
+		damagePerHit = 10,
+		promptText = "Chop small tree",
+		requiredTool = "axe",
+		canHarvest = true,
+		growsInto = "wood",
+		growTime = 30,
 	},
 }
 
@@ -59,6 +87,10 @@ function ResourceNodeService:CreateNode(nodeType, position)
 
 	local prompt = createPrompt(part, def.promptText)
 
+	if def.canHarvest == false then
+		prompt.Enabled = false
+	end
+
 	self.Nodes[part] = {
 		type = nodeType,
 		health = def.maxHealth,
@@ -72,6 +104,21 @@ function ResourceNodeService:CreateNode(nodeType, position)
 		self:HarvestNode(player, part)
 	end)
 
+	if def.growsInto and def.growTime then
+		task.delay(def.growTime, function()
+			if not self.Nodes[part] then
+				return
+			end
+
+			local oldPosition = part.Position
+
+			self.Nodes[part] = nil
+			part:Destroy()
+
+			self:CreateNode(def.growsInto, oldPosition)
+		end)
+	end
+
 	return part
 end
 
@@ -82,6 +129,9 @@ function ResourceNodeService:HarvestNode(player, part)
 	end
 
 	local def = NODE_DEFS[node.type]
+	if def.canHarvest == false then
+		return
+	end
 	local ToolService = Knit.GetService("ToolService")
 
 	if def.requiredTool and not ToolService:HasEquippedTool(player, def.requiredTool) then
@@ -105,7 +155,7 @@ function ResourceNodeService:HarvestNode(player, part)
 			local dropChance = 0.5
 
 			if math.random() <= dropChance then
-				ResourceService:Give(player, "seed", 1)
+				ResourceService:Give(player, "seed", 2)
 				print("[Node] Seed dropped for:", player.Name)
 			end
 		end
