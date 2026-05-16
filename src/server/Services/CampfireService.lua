@@ -12,6 +12,7 @@ CampfireService.MaxFuel = 100
 CampfireService.CurrentFuel = 80
 CampfireService.BurnRate = 1
 CampfireService.WoodToFuel = 10
+CampfireService.HasCampfire = false
 
 function CampfireService:DamageFuel(amount)
 	self.CurrentFuel = math.max(0, self.CurrentFuel - amount)
@@ -50,11 +51,11 @@ function CampfireService.Client:AddFuel(player)
 	return self.Server:AddFuel(player)
 end
 
-function CampfireService:CreateCampfire()
+function CampfireService:CreateCampfire(position)
 	local part = Instance.new("Part")
 	part.Name = "Campfire"
 	part.Size = Vector3.new(5, 1, 5)
-	part.Position = Vector3.new(0, 0.5, -15)
+	part.Position = position
 	part.Anchored = true
 	part.CanQuery = true
 	part.Parent = Workspace
@@ -81,13 +82,6 @@ function CampfireService:CreateCampfire()
 	fire.Size = 8
 	fire.Heat = 10
 	fire.Parent = part
-
-	-- local prompt = Instance.new("ProximityPrompt")
-	-- prompt.ActionText = "Add wood"
-	-- prompt.ObjectText = "Campfire"
-	-- prompt.HoldDuration = 0.4
-	-- prompt.MaxActivationDistance = 12
-	-- prompt.Parent = part
 
 	prompt.Triggered:Connect(function(player)
 		self:AddFuel(player)
@@ -122,8 +116,48 @@ function CampfireService:CreateCampfire()
 	self.Light = light
 end
 
+function CampfireService:BuildCampfire(player, position)
+
+	if self.HasCampfire then
+		return false, "campfire_exists"
+	end
+
+	local ResourceService =
+		Knit.GetService("ResourceService")
+
+	if not ResourceService:Take(
+		player,
+		"wood",
+		100
+	) then
+
+		return false, "not_enough_wood"
+
+	end
+
+	self:CreateCampfire(position)
+
+	self.HasCampfire = true
+
+	print(
+		"[Campfire] Built by",
+		player.Name
+	)
+
+	return true
+
+end
+
+function CampfireService.Client:BuildCampfire(player, position)
+
+	return self.Server:BuildCampfire(
+		player,
+		position
+	)
+
+end
+
 function CampfireService:KnitStart()
-	self:CreateCampfire()
 
 	task.spawn(function()
 		while true do
