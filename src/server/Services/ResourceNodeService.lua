@@ -71,6 +71,44 @@ local function createPrompt(part, text)
 	return prompt
 end
 
+function ResourceNodeService.Client:HitNode(
+	player,
+	nodePart
+)
+	return self.Server:HitNode(
+		player,
+		nodePart
+	)
+end
+
+function ResourceNodeService:HitNode(player, part)
+	local node = self.Nodes[part]
+
+	if not node then
+		return false
+	end
+
+	local character = player.Character
+	if not character then
+		return false
+	end
+
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if not root then
+		return false
+	end
+
+	local distance = (root.Position - part.Position).Magnitude
+
+	print( "[Node Distance]", math.floor(distance) )
+
+	if distance > 25 then
+		return false, "too_far"
+	end
+
+	return self:HarvestNode(player, part)
+end
+
 function ResourceNodeService:CreateNode(nodeType, position)
 	local def = NODE_DEFS[nodeType]
 	if not def then
@@ -85,10 +123,14 @@ function ResourceNodeService:CreateNode(nodeType, position)
 	part.Anchored = true
 	part.Parent = Workspace
 
-	local prompt = createPrompt(part, def.promptText)
+	local prompt = nil
 
-	if def.canHarvest == false then
-		prompt.Enabled = false
+	if nodeType == "scrap" then
+		prompt = createPrompt(part, def.promptText)
+
+		prompt.Triggered:Connect(function(player)
+			self:HarvestNode(player, part)
+		end)
 	end
 
 	self.Nodes[part] = {
@@ -99,10 +141,6 @@ function ResourceNodeService:CreateNode(nodeType, position)
 		damagePerHit = def.damagePerHit,
 		prompt = prompt,
 	}
-
-	prompt.Triggered:Connect(function(player)
-		self:HarvestNode(player, part)
-	end)
 
 	if def.growsInto and def.growTime then
 		task.delay(def.growTime, function()
