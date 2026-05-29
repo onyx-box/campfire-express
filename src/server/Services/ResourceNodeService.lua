@@ -109,6 +109,32 @@ function ResourceNodeService:HitNode(player, part)
 	return self:HarvestNode(player, part)
 end
 
+local function createHealthBar(part)
+	local gui = Instance.new("BillboardGui")
+	gui.Name = "HealthBar"
+	gui.Size = UDim2.fromOffset(80, 12)
+	gui.StudsOffset = Vector3.new(0, part.Size.Y / 2 + 1, 0)
+	gui.AlwaysOnTop = true
+	gui.Enabled = false
+	gui.Parent = part
+
+	local background = Instance.new("Frame")
+	background.Name = "Background"
+	background.Size = UDim2.fromScale(1, 1)
+	background.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	background.BorderSizePixel = 0
+	background.Parent = gui
+
+	local fill = Instance.new("Frame")
+	fill.Name = "Fill"
+	fill.Size = UDim2.fromScale(1, 1)
+	fill.BackgroundColor3 = Color3.fromRGB(80, 220, 80)
+	fill.BorderSizePixel = 0
+	fill.Parent = background
+
+	return gui, fill
+end
+
 function ResourceNodeService:CreateNode(nodeType, position)
 	local def = NODE_DEFS[nodeType]
 	if not def then
@@ -122,6 +148,12 @@ function ResourceNodeService:CreateNode(nodeType, position)
 	part.Position = position
 	part.Anchored = true
 	part.Parent = Workspace
+
+	local healthGui, healthFill = nil, nil
+
+	if def.canHarvest then
+		healthGui, healthFill = createHealthBar(part)
+	end
 
 	local prompt = nil
 
@@ -140,6 +172,8 @@ function ResourceNodeService:CreateNode(nodeType, position)
 		amountPerHit = def.amountPerHit,
 		damagePerHit = def.damagePerHit,
 		prompt = prompt,
+		healthGui = healthGui,
+		healthFill = healthFill,
 	}
 
 	if def.growsInto and def.growTime then
@@ -159,6 +193,8 @@ function ResourceNodeService:CreateNode(nodeType, position)
 
 	return part
 end
+
+
 
 function ResourceNodeService:HarvestNode(player, part)
 	local node = self.Nodes[part]
@@ -185,6 +221,22 @@ function ResourceNodeService:HarvestNode(player, part)
 
 	local percent = math.max(0, node.health / node.maxHealth)
 	part.Transparency = 1 - percent * 0.9
+	
+	if node.healthGui then
+		node.healthGui.Enabled = true
+	end
+
+	if node.healthFill then
+		node.healthFill.Size = UDim2.fromScale(percent, 1)
+
+		if percent <= 0.3 then
+			node.healthFill.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+		elseif percent <= 0.6 then
+			node.healthFill.BackgroundColor3 = Color3.fromRGB(255, 200, 80)
+		else
+			node.healthFill.BackgroundColor3 = Color3.fromRGB(80, 220, 80)
+		end
+	end
 
 	print("[Node]", part.Name, node.health, "/", node.maxHealth)
 
