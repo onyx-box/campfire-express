@@ -82,7 +82,8 @@ function ToolController:KnitStart()
 			local handle = tool:FindFirstChild("Handle")
 			if handle then
 				local sound = Instance.new("Sound")
-				sound.SoundId = "rbxassetid://12222225"
+				--sound.SoundId = "rbxassetid://12222225"
+                sound.SoundId = "rbxassetid://9114084044"
 				sound.Volume = 0.6
 				sound.Parent = handle
 				sound:Play()

@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
+local Debris = game:GetService("Debris")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
@@ -194,7 +195,63 @@ function ResourceNodeService:CreateNode(nodeType, position)
 	return part
 end
 
+function ResourceNodeService:FallAndDestroy(part)
+	if not part or not part.Parent then
+		return
+	end
 
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://9120259393"
+	sound.Volume = 0.8
+	sound.Parent = part
+	sound:Play()
+
+	part.Anchored = true
+	part.CanCollide = false
+
+	local startCFrame = part.CFrame
+
+	local fallDirection = Vector3.new(
+		math.random(-100, 100) / 100,
+		0,
+		math.random(-100, 100) / 100
+	)
+
+	if fallDirection.Magnitude < 0.1 then
+		fallDirection = Vector3.new(1, 0, 0)
+	end
+
+	fallDirection = fallDirection.Unit
+
+	local axis = fallDirection:Cross(Vector3.yAxis).Unit
+	local targetCFrame = startCFrame * CFrame.fromAxisAngle(axis, math.rad(85))
+
+	local steps = 20
+
+	for i = 1, steps do
+		local alpha = i / steps
+		part.CFrame = startCFrame:Lerp(targetCFrame, alpha)
+		task.wait(0.02)
+	end
+
+	local impact = Instance.new("Sound")
+	impact.SoundId = "rbxassetid://6972249696"
+	impact.Volume = 1
+	impact.Parent = part
+	impact:Play()
+
+	task.wait(1.5)
+
+	for i = 1, 20 do
+		local alpha = i / 20
+		part.Transparency = alpha
+		task.wait(0.03)
+	end
+
+	if part and part.Parent then
+		part:Destroy()
+	end
+end
 
 function ResourceNodeService:HarvestNode(player, part)
 	local node = self.Nodes[part]
@@ -220,7 +277,6 @@ function ResourceNodeService:HarvestNode(player, part)
 	node.health -= node.damagePerHit
 
 	local percent = math.max(0, node.health / node.maxHealth)
-	part.Transparency = 1 - percent * 0.9
 	
 	if node.healthGui then
 		node.healthGui.Enabled = true
@@ -242,6 +298,7 @@ function ResourceNodeService:HarvestNode(player, part)
 
 	if node.health <= 0 then
 		if node.type == "wood" then
+
 			local dropChance = 0.5
 
 			if math.random() <= dropChance then
@@ -251,7 +308,15 @@ function ResourceNodeService:HarvestNode(player, part)
 		end
 
 		self.Nodes[part] = nil
-		part:Destroy()
+
+		if node.type == "wood" or node.type == "smallTree" then
+			task.spawn(function()
+				self:FallAndDestroy(part)
+			end)
+		else
+			part:Destroy()
+		end
+
 	end
 end
 
