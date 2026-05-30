@@ -12,7 +12,7 @@ local TrainService = Knit.CreateService({
 
 TrainService.Speed = 9
 TrainService.CurrentWaypoint = 1
-TrainService.IsMoving = true
+TrainService.IsMoving = false
 
 function TrainService:CreateTrain()
 	local wagon = Instance.new("Part")
@@ -25,6 +25,46 @@ function TrainService:CreateTrain()
 	wagon.Parent = Workspace
 
 	self.Wagon = wagon
+
+	local prompt = Instance.new("ProximityPrompt")
+
+	prompt.ActionText = "Start Train"
+	prompt.ObjectText = "Locomotive"
+
+	prompt.MaxActivationDistance = 10
+
+	prompt.Parent = self.Wagon
+
+	prompt.Triggered:Connect(function(player)
+
+		local ResourceService = Knit.GetService( "ResourceService" )
+
+		local biome = Knit.GetService( "BiomeService" ):GetCurrentBiome()
+
+		local key = biome.nextBiomeKey
+
+		if not ResourceService:Has( player, key, 1 ) then
+
+			warn( "[Train] Missing key:", key )
+
+			return
+		end
+
+		ResourceService:Take( player, key, 1 )
+
+		self:StartTrain()
+
+	end)
+end
+
+function TrainService:StartTrain()
+	if self.IsMoving then
+		return
+	end
+
+	self.IsMoving = true
+
+	print("[Train] Departing...")
 end
 
 function TrainService:GetPlayersOnTrain()
@@ -73,7 +113,13 @@ function TrainService:Move(dt)
 	local nextWaypoint = TrainPath[self.CurrentWaypoint + 1]
 
 	if not nextWaypoint then
+		local BiomeService = Knit.GetService( "BiomeService" )
+
+		BiomeService:NextBiome()
+
 		self.IsMoving = false
+		self.CurrentWaypoint = 1
+		self.Wagon.Position = TrainPath[1]
 		print("[Train] Arrived at final station")
 		return
 	end
@@ -101,7 +147,12 @@ function TrainService:Move(dt)
 	local delta = self.Wagon.Position - oldPosition
 
 	for _, root in ipairs(passengers) do
-		root.CFrame = root.CFrame + delta
+		local character = root.Parent
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+		if humanoid and humanoid.MoveDirection.Magnitude < 0.1 then
+			root.CFrame = root.CFrame + delta
+		end
 	end
 end
 

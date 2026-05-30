@@ -48,11 +48,6 @@ function ResourceDropService:CreateDrop(resourceType, amount, position)
 		local ResourceService = Knit.GetService("ResourceService")
 		ResourceService:Give(player, resourceType, amount)
 
-		if resourceType == "forest_train_key" then
-			local BiomeService = Knit.GetService("BiomeService")
-			BiomeService:NextBiome()
-		end
-
 		drop:Destroy()
 	end)
 
