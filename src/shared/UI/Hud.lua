@@ -13,6 +13,7 @@ return function(props)
 	local buildMode = props.buildMode
 	local campfireFuel = props.campfireFuel
 	local temperature = props.temperature
+	local biome = props.biome
 
 	return scope:New("ScreenGui")({
 		Name = "CampfireHud",
@@ -52,6 +53,19 @@ return function(props)
 						TextSize = 18,
 						Font = Enum.Font.GothamBold,
 						Text = "🔥 Campfire Express",
+					}),
+
+					scope:New("TextLabel")({
+						Size = UDim2.new(1, 0, 0, 22),
+						BackgroundTransparency = 1,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextColor3 = Color3.fromRGB(180, 220, 255),
+						TextSize = 16,
+						Font = Enum.Font.GothamBold,
+						Text = scope:Computed(function(use)
+							local currentBiome = use(biome) or {}
+							return "🌍 Biome: " .. tostring(currentBiome.name or "Unknown")
+						end),
 					}),
 
 					scope:New("TextLabel")({

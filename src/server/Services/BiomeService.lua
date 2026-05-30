@@ -14,6 +14,10 @@ function BiomeService:GetCurrentBiome()
 	]
 end
 
+function BiomeService.Client:GetCurrentBiome(player)
+	return self.Server:GetCurrentBiome()
+end
+
 function BiomeService:NextBiome()
 
 	self.CurrentBiomeIndex += 1
@@ -25,6 +29,9 @@ function BiomeService:NextBiome()
 	local biome = self:GetCurrentBiome()
 
 	print( "[Biome] Changed to:", biome.name )
+
+	local WorldService = Knit.GetService("WorldService")
+	WorldService:GenerateCurrentBiome()
 
 	return biome
 end

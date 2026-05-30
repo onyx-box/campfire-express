@@ -22,6 +22,8 @@ function HudController:KnitStart()
 	local CampfireService = Knit.GetService("CampfireService")
 	local ColdService = Knit.GetService("ColdService")
 
+	local BiomeService = Knit.GetService("BiomeService")
+
 	self.wood = scope:Value(0)
 	self.scrap = scope:Value(0)
 	self.seed = scope:Value(0)
@@ -41,6 +43,11 @@ function HudController:KnitStart()
 		max = 100,
 	})
 
+	self.biome = scope:Value({
+		id = "unknown",
+		name = "Unknown",
+	})
+
 	local gui = Hud({
 		wood = self.wood,
 		scrap = self.scrap,
@@ -49,12 +56,23 @@ function HudController:KnitStart()
 		campfireFuel = self.campfireFuel,
 		temperature = self.temperature,
 		seed = self.seed,
+		biome = self.biome,
 	})
 
 	gui.Parent = playerGui
 
 	task.spawn(function()
 		while true do
+
+			BiomeService:GetCurrentBiome()
+				:andThen(function(biome)
+					self.biome:set({
+						id = biome.id or "unknown",
+						name = biome.name or "Unknown",
+					})
+				end)
+				:catch(warn)
+
 			ResourceService:GetResources()
 				:andThen(function(resources)
 					resources = resources or {}
@@ -97,7 +115,6 @@ function HudController:KnitStart()
 					})
 				end)
 				:catch(warn)
-
 				
 			task.wait(0.25)
 		end
