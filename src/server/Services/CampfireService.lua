@@ -58,6 +58,8 @@ function CampfireService:CreateCampfire(position)
 	part.Position = position
 	part.Anchored = true
 	part.CanQuery = true
+	part.Color = Color3.fromRGB(80, 45, 25)
+	part.Material = Enum.Material.Slate	
 	part.Parent = Workspace
 
 	local promptPart = Instance.new("Part")

@@ -30,7 +30,8 @@ function ResourceDropService:CreateDrop(resourceType, amount, position)
 		drop.Color = Color3.fromRGB(80, 220, 80)
 	elseif resourceType == "forest_train_key" then
 		drop.Material = Enum.Material.Neon
-		drop.Color = Color3.fromRGB(255, 220, 80)
+		drop.Color = Color3.fromRGB(255, 220, 60)
+		drop.Size = Vector3.new(2, 2, 2)
 	else
 		drop.Material = Enum.Material.Metal
 		drop.Color = Color3.fromRGB(120, 120, 120)

@@ -20,6 +20,7 @@ function TrainService:CreateTrain()
 	wagon.Size = Vector3.new(24, 2, 14)
 	wagon.Position = TrainPath[1]
 	wagon.Anchored = true
+	wagon.Color = Color3.fromRGB(70, 70, 80)
 	wagon.Material = Enum.Material.Metal
 	wagon.Parent = Workspace
 

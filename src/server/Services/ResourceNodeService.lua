@@ -148,6 +148,19 @@ function ResourceNodeService:CreateNode(nodeType, position)
 	part.Size = def.size
 	part.Position = position
 	part.Anchored = true
+	if nodeType == "wood" then
+		part.Color = Color3.fromRGB(90, 140, 70)
+		part.Material = Enum.Material.Wood
+	elseif nodeType == "smallTree" then
+		part.Color = Color3.fromRGB(110, 180, 90)
+		part.Material = Enum.Material.Wood
+	elseif nodeType == "sapling" then
+		part.Color = Color3.fromRGB(80, 220, 90)
+		part.Material = Enum.Material.Grass
+	elseif nodeType == "scrap" then
+		part.Color = Color3.fromRGB(110, 110, 110)
+		part.Material = Enum.Material.Metal
+	end
 	part.Parent = Workspace
 
 	local healthGui, healthFill = nil, nil

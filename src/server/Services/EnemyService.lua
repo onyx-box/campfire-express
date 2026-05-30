@@ -92,6 +92,8 @@ function EnemyService:SpawnEnemy(enemyTypeId, position)
 	part.Size = def.size
 	part.Position = Paths.MainPath[1]
 	part.Anchored = true
+	part.Color = def.color or Color3.fromRGB(180, 80, 80)
+	part.Material = enemyTypeId == "boss_forest" and Enum.Material.Neon or Enum.Material.SmoothPlastic
 	part.Parent = Workspace
 
 	local components = {
@@ -141,6 +143,8 @@ function EnemyService:SpawnTurret(position)
 	part.Size = Vector3.new(3, 5, 3)
 	part.Position = position
 	part.Anchored = true
+	part.Color = Color3.fromRGB(80, 160, 255)
+	part.Material = Enum.Material.Metal
 	part.Parent = Workspace
 
 	local turretId = self.world:spawn(
