@@ -10,7 +10,7 @@ local TrainService = Knit.CreateService({
 	Client = {},
 })
 
-TrainService.Speed = 18
+TrainService.Speed = 9
 TrainService.CurrentWaypoint = 1
 TrainService.IsMoving = true
 
@@ -27,6 +27,44 @@ function TrainService:CreateTrain()
 	self.Wagon = wagon
 end
 
+function TrainService:GetPlayersOnTrain()
+	local playersOnTrain = {}
+
+	if not self.Wagon then
+		return playersOnTrain
+	end
+
+	local wagon = self.Wagon
+	local wagonSize = wagon.Size
+	local wagonPosition = wagon.Position
+
+	for _, player in ipairs(game.Players:GetPlayers()) do
+		local character = player.Character
+		if not character then
+			continue
+		end
+
+		local root = character:FindFirstChild("HumanoidRootPart")
+		if not root then
+			continue
+		end
+
+		local relative = wagon.CFrame:PointToObjectSpace(root.Position)
+
+		local isOnTop =
+			math.abs(relative.X) <= wagonSize.X / 2
+			and math.abs(relative.Z) <= wagonSize.Z / 2
+			and relative.Y >= wagonSize.Y / 2
+			and relative.Y <= wagonSize.Y / 2 + 8
+
+		if isOnTop then
+			table.insert(playersOnTrain, root)
+		end
+	end
+
+	return playersOnTrain
+end
+
 function TrainService:Move(dt)
 	if not self.IsMoving or not self.Wagon then
 		return
@@ -39,6 +77,8 @@ function TrainService:Move(dt)
 		print("[Train] Arrived at final station")
 		return
 	end
+	local passengers = self:GetPlayersOnTrain()
+	local oldPosition = self.Wagon.Position
 
 	local currentPosition = self.Wagon.Position
 	local direction = nextWaypoint - currentPosition
@@ -57,6 +97,12 @@ function TrainService:Move(dt)
 	end
 
 	self.Wagon.Position += move
+
+	local delta = self.Wagon.Position - oldPosition
+
+	for _, root in ipairs(passengers) do
+		root.CFrame = root.CFrame + delta
+	end
 end
 
 function TrainService:KnitStart()
