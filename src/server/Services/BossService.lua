@@ -7,13 +7,14 @@ local BossService = Knit.CreateService({
 	Client = {},
 })
 
-function BossService:SpawnForestBoss()
+function BossService:SpawnCurrentBiomeBoss()
 	local EnemyService = Knit.GetService("EnemyService")
+	local biome = Knit.GetService( "BiomeService" ):GetCurrentBiome()
 
-	print("[Boss] Forest boss spawned")
+	print("[Boss] Spawned:", biome.boss)
 
 	return EnemyService:SpawnEnemy(
-		"boss_forest",
+		biome.boss,
 		Vector3.new(-40, 3, -15)
 	)
 end

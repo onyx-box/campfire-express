@@ -59,12 +59,21 @@ function WorldService:GenerateScrap()
 
 end
 
-function WorldService:KnitStart()
+function WorldService:GenerateCurrentBiome()
+	local biome = Knit.GetService("BiomeService"):GetCurrentBiome()
 
-	task.wait(1)
+	self.TreeCount = biome.treeCount
+	self.ScrapCount = biome.scrapCount
+	self.WorldRadius = biome.worldRadius or 250
 
 	self:GenerateTrees()
 	self:GenerateScrap()
+end
+
+function WorldService:KnitStart()
+
+	task.wait(1)
+	self:GenerateCurrentBiome()
 
 end
 

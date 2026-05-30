@@ -26,7 +26,7 @@ function WaveService:KnitStart()
 	task.wait(5)
 
 	local BossService = Knit.GetService("BossService")
-	BossService:SpawnForestBoss()
+	BossService:SpawnCurrentBiomeBoss()
 
 end
 
@@ -41,6 +41,8 @@ function WaveService:StartWave(waveNumber)
 		return
 	end
 
+	local biome = Knit.GetService( "BiomeService" ):GetCurrentBiome()
+
 	print("Starting wave:", waveNumber)
 
 	task.spawn(function()
@@ -48,9 +50,13 @@ function WaveService:StartWave(waveNumber)
 		for _, group in ipairs(wave.enemies) do
 
 			for i = 1, group.count do
+				local enemyType = group.type
 
+				if enemyType == "biome_random" then
+					enemyType = biome.enemyPool[math.random(#biome.enemyPool)]
+				end
 				EnemyService:SpawnEnemy(
-					group.type,
+					enemyType,
 					Vector3.new(0, 3, math.random(-20, 20))
 				)
 
