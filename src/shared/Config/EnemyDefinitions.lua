@@ -31,4 +31,15 @@ return {
 			scrap = 20,
 		},
 	},
+	boss_forest = {
+		name = "Forest Boss",
+		health = 800,
+		speed = 2,
+		size = Vector3.new(7, 8, 7),
+
+		reward = {
+			wood = 100,
+			scrap = 50,
+		},
+	},
 }

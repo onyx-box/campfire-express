@@ -23,6 +23,11 @@ function WaveService:KnitStart()
 
 	self:StartWave(3)
 
+	task.wait(5)
+
+	local BossService = Knit.GetService("BossService")
+	BossService:SpawnForestBoss()
+
 end
 
 function WaveService:StartWave(waveNumber)

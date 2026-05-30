@@ -39,6 +39,8 @@ local EnemyCampfireAttackSystem = require(ReplicatedStorage.Shared.Systems.Enemy
 
 local Reward = require(ReplicatedStorage.Shared.Components.Reward)
 
+local Boss = require(ReplicatedStorage.Shared.Components.Boss)
+
 local EnemyService = Knit.CreateService({
 	Name = "EnemyService",
 	Client = {},
@@ -92,31 +94,24 @@ function EnemyService:SpawnEnemy(enemyTypeId, position)
 	part.Anchored = true
 	part.Parent = Workspace
 
-	local enemyId = self.world:spawn(
+	local components = {
 		Enemy(),
-		EnemyType({
-			id = enemyTypeId,
-		}),
-		Model({
-			instance = part,
-		}),
-		Position({
-			value = Paths.MainPath[1],
-		}),
-		Velocity({
-			value = Vector3.new(def.speed, 0, 0),
-		}),
-		Health({
-			current = def.health,
-			max = def.health,
-		}),
-		Goal({
-			x = 80,
-			damage = 10,
+		EnemyType({ id = enemyTypeId }),
+		Model({ instance = part }),
+		Position({ value = part.Position }),
+		Velocity({ value = Vector3.new(def.speed, 0, 0) }),
+		Health({ current = def.health, max = def.health }),
+		Reward({
+			wood = def.reward and def.reward.wood or 0,
+			scrap = def.reward and def.reward.scrap or 0,
 		}),
 		Path({
 			points = Paths.MainPath,
 			current = 1,
+		}),
+		Goal({
+			x = 80,
+			damage = 10,
 		}),
 		AttackCampfire({
 			range = 8,
@@ -124,11 +119,16 @@ function EnemyService:SpawnEnemy(enemyTypeId, position)
 			cooldown = 1.5,
 			timeUntilNextAttack = 0,
 		}),
-		Reward({
-			wood = def.reward.wood,
-			scrap = def.reward.scrap,
-		})
-	)
+	}
+
+	if enemyTypeId == "boss_forest" then
+		table.insert(components, Boss({
+			id = "forest_boss",
+			dropsKey = "forest_train_key",
+		}))
+	end
+
+	local enemyId = self.world:spawn(table.unpack(components))
 
 	print("Enemy spawned:", enemyId, enemyTypeId)
 

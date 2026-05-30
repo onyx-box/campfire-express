@@ -3,6 +3,7 @@ local Model = require(script.Parent.Parent.Components.Model)
 local Reward = require(script.Parent.Parent.Components.Reward)
 local LastDamagedBy = require(script.Parent.Parent.Components.LastDamagedBy)
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
+local Boss = require(script.Parent.Parent.Components.Boss)
 
 return function(world)
 	for id, health, model, reward, damagedBy in world:query(Health, Model, Reward, LastDamagedBy) do
@@ -25,6 +26,20 @@ return function(world)
 						"scrap",
 						reward.scrap
 					)
+
+					local boss = world:get(id, Boss)
+
+					if boss then
+						local ResourceDropService = Knit.GetService("ResourceDropService")
+
+						ResourceDropService:CreateDrop(
+							boss.dropsKey,
+							1,
+							model.instance.Position
+						)
+
+						print("[Boss] Dropped key:", boss.dropsKey)
+					end
 
 					print(
 						"[Reward]",
