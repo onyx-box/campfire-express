@@ -137,6 +137,7 @@ function CampfireService:BuildCampfire(player, position)
 
 	end
 
+	self.CurrentFuel = self.MaxFuel
 	self:CreateCampfire(position)
 
 	self.HasCampfire = true
@@ -163,7 +164,9 @@ function CampfireService:KnitStart()
 
 	task.spawn(function()
 		while true do
-			self.CurrentFuel = math.max(0, self.CurrentFuel - self.BurnRate)
+			if self.HasCampfire then
+				self.CurrentFuel = math.max(0, self.CurrentFuel - self.BurnRate)
+			end
 
 			local percent = self.CurrentFuel / self.MaxFuel
 
