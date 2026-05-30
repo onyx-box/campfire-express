@@ -272,8 +272,6 @@ function ResourceNodeService:HarvestNode(player, part)
 
 	local ResourceService = Knit.GetService("ResourceService")
 
-	ResourceService:Give(player, node.type, node.amountPerHit)
-
 	node.health -= node.damagePerHit
 
 	local percent = math.max(0, node.health / node.maxHealth)
@@ -297,23 +295,28 @@ function ResourceNodeService:HarvestNode(player, part)
 	print("[Node]", part.Name, node.health, "/", node.maxHealth)
 
 	if node.health <= 0 then
-		if node.type == "wood" then
+		local ResourceDropService = Knit.GetService("ResourceDropService")
+
+		if node.type == "wood" or node.type == "smallTree" then
+			ResourceDropService:CreateDrop("wood", 50, part.Position)
 
 			local dropChance = 0.5
 
 			if math.random() <= dropChance then
-				ResourceService:Give(player, "seed", 2)
+				ResourceDropService:CreateDrop("seed", 2, part.Position)
 				print("[Node] Seed dropped for:", player.Name)
 			end
-		end
 
-		self.Nodes[part] = nil
+			self.Nodes[part] = nil
 
-		if node.type == "wood" or node.type == "smallTree" then
 			task.spawn(function()
 				self:FallAndDestroy(part)
 			end)
-		else
+
+		elseif node.type == "scrap" then
+			ResourceDropService:CreateDrop("scrap", 25, part.Position)
+
+			self.Nodes[part] = nil
 			part:Destroy()
 		end
 
