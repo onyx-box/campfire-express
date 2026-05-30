@@ -31,6 +31,7 @@ function BiomeService:NextBiome()
 	print( "[Biome] Changed to:", biome.name )
 
 	local WorldService = Knit.GetService("WorldService")
+	WorldService:ClearWorld()
 	WorldService:GenerateCurrentBiome()
 
 	return biome

@@ -3,9 +3,19 @@ return {
 		id = "forest",
 		name = "Forest",
 
-		treeCount = 80,
-		scrapCount = 30,
-        worldRadius = 250,
+		worldRadius = 250,
+
+		resources = {
+			wood = {
+				nodeType = "wood",
+				count = 80,
+			},
+
+			scrap = {
+				nodeType = "scrap",
+				count = 30,
+			},
+		},
 
 		enemyPool = {
 			"basic",
@@ -13,33 +23,39 @@ return {
 		},
 
 		boss = "boss_forest",
+		bossKey = "forest_train_key",
+		nextBiomeKey = "forest_train_key",
 
-		ambientColor = Color3.fromRGB(
-			120,
-			180,
-			120
-		),
+		ambientColor = Color3.fromRGB(120, 180, 120),
 	},
 
 	{
 		id = "desert",
 		name = "Desert",
 
-		treeCount = 10,
-		scrapCount = 50,
-        worldRadius = 250,
-        
+		worldRadius = 280,
+
+		resources = {
+			cactus = {
+				nodeType = "cactus",
+				count = 35,
+			},
+
+			scrap = {
+				nodeType = "scrap",
+				count = 55,
+			},
+		},
+
 		enemyPool = {
 			"fast",
 			"tank",
 		},
 
 		boss = "boss_desert",
+		bossKey = "desert_train_key",
+		nextBiomeKey = "desert_train_key",
 
-		ambientColor = Color3.fromRGB(
-			240,
-			210,
-			120
-		),
+		ambientColor = Color3.fromRGB(235, 205, 120),
 	},
 }

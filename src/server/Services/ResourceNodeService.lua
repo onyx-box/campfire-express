@@ -59,6 +59,16 @@ local NODE_DEFS = {
 		growsInto = "wood",
 		growTime = 30,
 	},
+	cactus = {
+		name = "Cactus",
+		size = Vector3.new(2,8,2),
+		amountPerHit = 10,
+		maxHealth = 40,
+		damagePerHit = 10,
+		promptText = "Harvest cactus",
+		requiredTool = "axe",
+		canHarvest = true,
+	},
 }
 
 local function createPrompt(part, text)
@@ -160,6 +170,9 @@ function ResourceNodeService:CreateNode(nodeType, position)
 	elseif nodeType == "scrap" then
 		part.Color = Color3.fromRGB(110, 110, 110)
 		part.Material = Enum.Material.Metal
+	elseif nodeType == "cactus" then
+		part.Color = Color3.fromRGB(70, 180, 70)
+		part.Material = Enum.Material.Grass
 	end
 	part.Parent = Workspace
 

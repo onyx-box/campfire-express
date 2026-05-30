@@ -21,44 +21,6 @@ function WorldService:GetRandomPosition()
 
 end
 
-function WorldService:GenerateTrees()
-
-	local ResourceNodeService = Knit.GetService("ResourceNodeService")
-
-	for i = 1, self.TreeCount do
-
-		local position = self:GetRandomPosition()
-
-		ResourceNodeService:CreateNode(
-			"wood",
-			position
-		)
-
-	end
-
-	print("[World] Trees generated")
-
-end
-
-function WorldService:GenerateScrap()
-
-	local ResourceNodeService = Knit.GetService("ResourceNodeService")
-
-	for i = 1, self.ScrapCount do
-
-		local position = self:GetRandomPosition()
-
-		ResourceNodeService:CreateNode(
-			"scrap",
-			position
-		)
-
-	end
-
-	print("[World] Scrap generated")
-
-end
-
 function WorldService:GenerateCurrentBiome()
 	local biome = Knit.GetService("BiomeService"):GetCurrentBiome()
 
@@ -66,8 +28,49 @@ function WorldService:GenerateCurrentBiome()
 	self.ScrapCount = biome.scrapCount
 	self.WorldRadius = biome.worldRadius or 250
 
-	self:GenerateTrees()
-	self:GenerateScrap()
+		for _, resourceDef in pairs(
+		biome.resources
+	) do
+
+		for i = 1, resourceDef.count do
+
+			local position = self:GetRandomPosition()
+
+			Knit.GetService(
+				"ResourceNodeService"
+			):CreateNode(
+				resourceDef.nodeType,
+				position
+			)
+
+		end
+	end
+
+	print(
+		"[World] Generated biome:",
+		biome.name
+	)
+end
+
+function WorldService:ClearWorld()
+
+	local ResourceNodeService =
+		Knit.GetService(
+			"ResourceNodeService"
+		)
+
+	for part, _ in pairs(
+		ResourceNodeService.Nodes
+	) do
+
+		if part and part.Parent then
+			part:Destroy()
+		end
+
+	end
+
+	ResourceNodeService.Nodes = {}
+
 end
 
 function WorldService:KnitStart()

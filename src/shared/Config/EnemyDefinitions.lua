@@ -45,4 +45,15 @@ return {
 			scrap = 50,
 		},
 	},
+	boss_desert = {
+		name = "Desert Boss",
+		health = 1200,
+		speed = 3,
+		size = Vector3.new(8, 8, 8),
+		color = Color3.fromRGB(255, 220, 80),
+		reward = {
+			wood = 50,
+			scrap = 150,
+		},
+	},
 }
