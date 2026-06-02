@@ -36,10 +36,6 @@ function ColdService:GetTemperature(player)
 	}
 end
 
-function ColdService:IsNight()
-	return self.Time >= 18 or self.Time <= 6
-end
-
 function ColdService:IsPlayerWarm(player)
 	local character = player.Character
 	if not character then
@@ -62,11 +58,12 @@ function ColdService:IsPlayerWarm(player)
 end
 
 function ColdService:UpdatePlayerTemperature(player)
+	local DayNightService = Knit.GetService("DayNightService")
 	self.PlayerTemperature[player] = self.PlayerTemperature[player] or self.MaxTemperature
 
 	local isWarm = self:IsPlayerWarm(player)
 
-	if self:IsNight() and not isWarm then
+	if DayNightService.IsNight and not isWarm then
 		self.PlayerTemperature[player] = math.max(
 			self.MinTemperature,
 			self.PlayerTemperature[player] - self.CoolRate
@@ -103,7 +100,8 @@ end
 function ColdService:UpdateLighting()
 	Lighting.ClockTime = self.Time
 
-	if self:IsNight() then
+	local DayNightService = Knit.GetService("DayNightService")
+	if DayNightService.IsNight then
 		Lighting.Brightness = 1
 		Lighting.OutdoorAmbient = Color3.fromRGB(60, 60, 90)
 	else

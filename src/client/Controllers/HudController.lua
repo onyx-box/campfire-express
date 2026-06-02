@@ -23,6 +23,7 @@ function HudController:KnitStart()
 	local ColdService = Knit.GetService("ColdService")
 
 	local BiomeService = Knit.GetService("BiomeService")
+	local DayNightService = Knit.GetService( "DayNightService" )
 
 	self.wood = scope:Value(0)
 	self.scrap = scope:Value(0)
@@ -48,6 +49,8 @@ function HudController:KnitStart()
 		name = "Unknown",
 	})
 
+	self.night = scope:Value(false)
+
 	local gui = Hud({
 		wood = self.wood,
 		scrap = self.scrap,
@@ -57,6 +60,7 @@ function HudController:KnitStart()
 		temperature = self.temperature,
 		seed = self.seed,
 		biome = self.biome,
+		night = self.night,
 	})
 
 	gui.Parent = playerGui
@@ -70,6 +74,12 @@ function HudController:KnitStart()
 						id = biome.id or "unknown",
 						name = biome.name or "Unknown",
 					})
+				end)
+				:catch(warn)
+
+			DayNightService:GetState()
+				:andThen(function(state)
+					self.night:set(state.isNight == true)
 				end)
 				:catch(warn)
 

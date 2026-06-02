@@ -14,6 +14,7 @@ return function(props)
 	local campfireFuel = props.campfireFuel
 	local temperature = props.temperature
 	local biome = props.biome
+	local night = props.night
 
 	return scope:New("ScreenGui")({
 		Name = "CampfireHud",
@@ -65,6 +66,23 @@ return function(props)
 						Text = scope:Computed(function(use)
 							local currentBiome = use(biome) or {}
 							return "🌍 Biome: " .. tostring(currentBiome.name or "Unknown")
+						end),
+					}),
+
+					scope:New("TextLabel")({
+						Size = UDim2.new(1, 0, 0, 22),
+						BackgroundTransparency = 1,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextColor3 = Color3.fromRGB(180, 220, 255),
+						TextSize = 16,
+						Font = Enum.Font.GothamBold,
+						Text = scope:Computed(function(use)
+							local currentNight = use(night) or false
+							if currentNight then
+								return "🌙 Night"
+							else
+								return "☀️ Day"
+							end
 						end),
 					}),
 
