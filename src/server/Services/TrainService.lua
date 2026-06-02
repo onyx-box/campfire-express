@@ -10,9 +10,35 @@ local TrainService = Knit.CreateService({
 	Client = {},
 })
 
-TrainService.Speed = 9
+TrainService.MaxHealth = 1000
+TrainService.CurrentHealth = 1000
+TrainService.BaseSpeed = 20
 TrainService.CurrentWaypoint = 1
 TrainService.IsMoving = false
+
+function TrainService:Damage(amount)
+
+	self.CurrentHealth = math.max( 0, self.CurrentHealth - amount )
+
+	print( "[Train]", self.CurrentHealth, "/", self.MaxHealth )
+
+	if self.CurrentHealth <= 0 then
+
+		self.IsMoving = false
+
+		print( "[Train] Destroyed" )
+
+	end
+
+end
+
+function TrainService:Repair(amount)
+
+	self.CurrentHealth = math.min( self.MaxHealth, self.CurrentHealth + amount )
+
+	print( "[Train] Repaired:", self.CurrentHealth, "/", self.MaxHealth )
+
+end
 
 function TrainService:CreateTrain()
 	local wagon = Instance.new("Part")
@@ -55,6 +81,31 @@ function TrainService:CreateTrain()
 		self:StartTrain()
 
 	end)
+
+	local repairPrompt = Instance.new( "ProximityPrompt" )
+	repairPrompt.ActionText = "Repair Train"
+	repairPrompt.ObjectText = "Train"
+	repairPrompt.Parent = self.Wagon
+
+	repairPrompt.Triggered:Connect(
+		function(player)
+
+			local ResourceService = Knit.GetService( "ResourceService" )
+
+			if not ResourceService:Has( player, "scrap", 25 ) then
+				return
+			end
+			if not ResourceService:Has( player, "wood", 25 ) then
+				return
+			end
+
+			ResourceService:Take( player, "scrap", 25 )
+			ResourceService:Take( player, "wood", 25 )
+
+			self:Repair(100)
+
+		end
+	)
 end
 
 function TrainService:StartTrain()
@@ -136,7 +187,11 @@ function TrainService:Move(dt)
 		return
 	end
 
-	local move = direction.Unit * self.Speed * dt
+	local hpPercent = self.CurrentHealth / self.MaxHealth
+
+	local speedMultiplier = math.clamp( hpPercent, 0.25, 1 )
+
+	local move = direction.Unit * self.BaseSpeed * speedMultiplier * dt
 
 	if move.Magnitude > distance then
 		move = direction
