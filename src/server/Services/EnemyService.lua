@@ -57,10 +57,11 @@ function EnemyService.Client:PlaceTurret(player, position)
 
 	if train then
 		local relative = train.CFrame:PointToObjectSpace(position)
+		local margin = 2
 
 		isOnTrain =
-			math.abs(relative.X) <= train.Size.X / 2
-			and math.abs(relative.Z) <= train.Size.Z / 2
+			math.abs(relative.X) <= train.Size.X / 2 - margin
+			and math.abs(relative.Z) <= train.Size.Z / 2 - margin
 			and relative.Y >= train.Size.Y / 2
 			and relative.Y <= train.Size.Y / 2 + 8
 	end
@@ -186,10 +187,11 @@ function EnemyService:SpawnTurret(position)
 
 	if train then
 		local relative = train.CFrame:PointToObjectSpace(position)
+		local margin = 2
 
 		local isOnTrain =
-			math.abs(relative.X) <= train.Size.X / 2
-			and math.abs(relative.Z) <= train.Size.Z / 2
+			math.abs(relative.X) <= train.Size.X / 2 - margin
+			and math.abs(relative.Z) <= train.Size.Z / 2 - margin
 			and relative.Y >= train.Size.Y / 2
 			and relative.Y <= train.Size.Y / 2 + 8
 
@@ -208,9 +210,6 @@ function EnemyService:SpawnTurret(position)
 			math.abs(relativePos.X) <= train.Size.X / 2
 			and math.abs(relativePos.Z) <= train.Size.Z / 2
 
-		if isOnTrain then
-			part:SetAttribute("OnTrain", true)
-		end
 	end
 
 	return turretId
