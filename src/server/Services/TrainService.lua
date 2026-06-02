@@ -146,6 +146,12 @@ function TrainService:Move(dt)
 
 	local delta = self.Wagon.Position - oldPosition
 
+	for _, turret in ipairs(self:GetTurretsOnTrain()) do
+		if turret:IsA("BasePart") then
+			turret.Position += delta
+		end
+	end
+
 	for _, root in ipairs(passengers) do
 		local character = root.Parent
 		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -154,6 +160,18 @@ function TrainService:Move(dt)
 			root.CFrame = root.CFrame + delta
 		end
 	end
+end
+
+function TrainService:GetTurretsOnTrain()
+	local turrets = {}
+
+	for _, obj in ipairs(workspace:GetChildren()) do
+		if obj:GetAttribute("OnTrain") then
+			table.insert(turrets, obj)
+		end
+	end
+
+	return turrets
 end
 
 function TrainService:KnitStart()

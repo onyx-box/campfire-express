@@ -52,11 +52,29 @@ function EnemyService.Client:PlaceTurret(player, position)
 		return false, "invalid_position"
 	end
 
-	local isValid, snapped, reason =
-		PlacementUtil.IsValidTurretPosition(position)
+	local train = workspace:FindFirstChild("TrainWagon")
+	local isOnTrain = false
 
-	if not isValid then
-		return false, reason
+	if train then
+		local relative = train.CFrame:PointToObjectSpace(position)
+
+		isOnTrain =
+			math.abs(relative.X) <= train.Size.X / 2
+			and math.abs(relative.Z) <= train.Size.Z / 2
+			and relative.Y >= train.Size.Y / 2
+			and relative.Y <= train.Size.Y / 2 + 8
+	end
+
+	local snapped = position
+
+	if not isOnTrain then
+		local isValid, snappedPosition, reason = PlacementUtil.IsValidTurretPosition(position)
+
+		if not isValid then
+			return false, reason
+		end
+
+		snapped = snappedPosition
 	end
 
 	local ResourceService = Knit.GetService("ResourceService")
@@ -163,6 +181,37 @@ function EnemyService:SpawnTurret(position)
 	)
 
 	print("Turret spawned:", turretId)
+
+	local train = workspace:FindFirstChild("TrainWagon")
+
+	if train then
+		local relative = train.CFrame:PointToObjectSpace(position)
+
+		local isOnTrain =
+			math.abs(relative.X) <= train.Size.X / 2
+			and math.abs(relative.Z) <= train.Size.Z / 2
+			and relative.Y >= train.Size.Y / 2
+			and relative.Y <= train.Size.Y / 2 + 8
+
+		if isOnTrain then
+			part:SetAttribute("OnTrain", true)
+		end
+	end
+
+	local train = workspace:FindFirstChild("TrainWagon")
+
+	if train then
+		local relativePos =
+			train.CFrame:PointToObjectSpace(position)
+
+		local isOnTrain =
+			math.abs(relativePos.X) <= train.Size.X / 2
+			and math.abs(relativePos.Z) <= train.Size.Z / 2
+
+		if isOnTrain then
+			part:SetAttribute("OnTrain", true)
+		end
+	end
 
 	return turretId
 end

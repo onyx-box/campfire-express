@@ -48,8 +48,19 @@ function PlacementController:KnitStart()
 			return
 		end
 
-		local rawPosition = hit.Position
-		local isValid, snapped = PlacementUtil.IsValidTurretPosition(rawPosition)
+		local rawPosition = mouse.Hit.Position
+		local target = mouse.Target
+
+		local isOnTrain = target and target.Name == "TrainWagon"
+
+		local isValid, snapped
+
+		if isOnTrain then
+			snapped = Vector3.new(rawPosition.X, rawPosition.Y + 3, rawPosition.Z)
+			isValid = true
+		else
+			isValid, snapped = PlacementUtil.IsValidTurretPosition(rawPosition)
+		end
 
 		currentSnappedPosition = snapped
 		currentIsValid = isValid

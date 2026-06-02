@@ -4,6 +4,10 @@ local Model = require(script.Parent.Parent.Components.Model)
 return function(world)
 	for id, position, model in world:query(Position, Model) do
 		if model.instance and model.instance.Parent then
+			if model.instance:GetAttribute("OnTrain") then
+				continue
+			end
+
 			model.instance.Position = position.value
 		end
 	end
