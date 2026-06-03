@@ -14,7 +14,8 @@ return function(props)
 	local campfireFuel = props.campfireFuel
 	local temperature = props.temperature
 	local biome = props.biome
-	local night = props.night
+	local isNight = props.isNight
+	local day = props.day
 
 	return scope:New("ScreenGui")({
 		Name = "CampfireHud",
@@ -77,11 +78,12 @@ return function(props)
 						TextSize = 16,
 						Font = Enum.Font.GothamBold,
 						Text = scope:Computed(function(use)
-							local currentNight = use(night) or false
-							if currentNight then
-								return "🌙 Night"
+							local currentIsNight = use(isNight) or false
+							local currentDay = use(day) or 1
+							if currentIsNight then
+								return "🌙 Night " .. currentDay
 							else
-								return "☀️ Day"
+								return "☀️ Day " .. currentDay
 							end
 						end),
 					}),

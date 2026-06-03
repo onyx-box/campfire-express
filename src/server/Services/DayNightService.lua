@@ -11,9 +11,15 @@ DayNightService.NightDuration = 20
 
 DayNightService.IsNight = false
 
+DayNightService.NightStarted = Instance.new("BindableEvent")
+DayNightService.DayStarted = Instance.new("BindableEvent")
+
+DayNightService.DayNumber = 1
+
 function DayNightService:GetState()
 	return {
 		isNight = self.IsNight,
+        dayNumber = self.DayNumber,
 	}
 end
 
@@ -27,7 +33,9 @@ function DayNightService:SetDay()
 
 	Lighting.ClockTime = 14
 
-	print("[DayNight] Day")
+    self.DayStarted:Fire()
+    
+	print("[DayNight] Day", self.DayNumber)
 
 end
 
@@ -37,7 +45,9 @@ function DayNightService:SetNight()
 
 	Lighting.ClockTime = 0
 
-	print("[DayNight] Night")
+    self.NightStarted:Fire()
+
+	print("[DayNight] Night", self.DayNumber)
 
 end
 
@@ -55,6 +65,7 @@ function DayNightService:KnitStart()
 
 			task.wait( self.NightDuration )
 
+            self.DayNumber += 1
 		end
 
 	end)

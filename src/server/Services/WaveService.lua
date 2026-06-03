@@ -9,25 +9,33 @@ local WaveService = Knit.CreateService({
 	Client = {}
 })
 
+WaveService.CurrentWave = 1
+
 function WaveService:KnitStart()
 
-	task.wait(2)
+	local DayNightService = Knit.GetService( "DayNightService" )
 
-	self:StartWave(1)
+	DayNightService.NightStarted.Event:Connect(
+		function()
 
-	task.wait(15)
+			self:StartWaveNight()
 
-	self:StartWave(2)
+		end
+	)
 
-	task.wait(20)
+end
 
-	self:StartWave(3)
-
-	task.wait(5)
+function WaveService:StartWaveNight()
+	if WaveConfig[self.CurrentWave] then
+		self:StartWave(self.CurrentWave)
+		self.CurrentWave += 1
+		return
+	end
 
 	local BossService = Knit.GetService("BossService")
 	BossService:SpawnCurrentBiomeBoss()
 
+	self.CurrentWave = 1
 end
 
 function WaveService:StartWave(waveNumber)

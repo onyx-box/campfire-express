@@ -49,7 +49,8 @@ function HudController:KnitStart()
 		name = "Unknown",
 	})
 
-	self.night = scope:Value(false)
+	self.isNight = scope:Value(false)
+	self.day = scope:Value(1)
 
 	local gui = Hud({
 		wood = self.wood,
@@ -60,7 +61,8 @@ function HudController:KnitStart()
 		temperature = self.temperature,
 		seed = self.seed,
 		biome = self.biome,
-		night = self.night,
+		isNight = self.isNight,
+		day = self.day,
 	})
 
 	gui.Parent = playerGui
@@ -79,7 +81,8 @@ function HudController:KnitStart()
 
 			DayNightService:GetState()
 				:andThen(function(state)
-					self.night:set(state.isNight == true)
+					self.isNight:set(state.isNight == true)
+					self.day:set(state.dayNumber or 1)
 				end)
 				:catch(warn)
 
